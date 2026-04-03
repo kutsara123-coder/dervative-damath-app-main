@@ -18,6 +18,10 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
   <meta name="description" content="A new Flutter project.">
 
   <!-- iOS meta tags & icons -->
@@ -39,18 +43,27 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
+      background: #041a63;
     }
     
-    .flutter-loader {
-      position: absolute;
+    #flutter-loader {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background-image: url('splash-screen.png');
-      background-size: cover;
+      background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
+      background-color: #041a63;
+      z-index: 9999;
+      transition: opacity 220ms ease;
+    }
+
+    #flutter-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
     
     .flutter-loading::after {
@@ -59,7 +72,18 @@
   </style>
 </head>
 <body>
-  <div class="flutter-loader"></div>
+  <div id="flutter-loader"></div>
+  <script>
+    function hideFlutterLoader() {
+      const loader = document.getElementById('flutter-loader');
+      if (!loader) return;
+      loader.classList.add('hidden');
+      window.setTimeout(() => loader.remove(), 250);
+    }
+
+    window.addEventListener('flutter-first-frame', hideFlutterLoader);
+    window.setTimeout(hideFlutterLoader, 12000);
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
