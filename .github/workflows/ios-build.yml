@@ -1,0 +1,42 @@
+name: Build iOS (No Codesign)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Flutter SDK
+        run: git clone https://github.com/flutter/flutter.git --depth 1 -b stable "$HOME/flutter"
+
+      - name: Add Flutter to PATH
+        run: echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Precache iOS artifacts
+        run: flutter precache --ios
+
+      - name: Install Dart and Flutter dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install
+
+      - name: Build iOS app without code signing
+        run: flutter build ios --release --no-codesign
+
+      - name: Upload iOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-no-codesign-build
+          path: build/ios/iphoneos
+          if-no-files-found: error
